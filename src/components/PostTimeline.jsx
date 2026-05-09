@@ -10,12 +10,12 @@ function timeAgo(iso) {
 }
 
 const SOURCE = {
-  reddit: { label: 'Reddit', color: '#ff4500', bg: '#2a1a14' },
-  hackernews: { label: 'HN', color: '#ff6314', bg: '#2a1e14' },
+  gnews: { label: 'Google News', color: '#4285f4', bg: '#141e35' },
+  qiita: { label: 'Qiita', color: '#55c500', bg: '#14251a' },
 };
 
 function PostCard({ post, keywords }) {
-  const src = SOURCE[post.source] ?? SOURCE.hackernews;
+  const src = SOURCE[post.source] ?? SOURCE.gnews;
   const color = kwColor(post.keyword, keywords);
   return (
     <div style={s.card}>
@@ -29,10 +29,12 @@ function PostCard({ post, keywords }) {
         {post.title}
       </a>
       {post.sub && <span style={s.sub}>{post.sub}</span>}
-      <div style={s.stats}>
-        <span style={s.stat}>▲ {post.score.toLocaleString()}</span>
-        <span style={s.stat}>💬 {post.comments.toLocaleString()}</span>
-      </div>
+      {(post.score > 0 || post.comments > 0) && (
+        <div style={s.stats}>
+          {post.score > 0 && <span style={s.stat}>♥ {post.score.toLocaleString()}</span>}
+          {post.comments > 0 && <span style={s.stat}>💬 {post.comments.toLocaleString()}</span>}
+        </div>
+      )}
     </div>
   );
 }
@@ -42,7 +44,7 @@ export default function PostTimeline({ posts, keywords }) {
     return (
       <div style={s.empty}>
         <p style={s.emptyTitle}>投稿がありません</p>
-        <p style={s.emptyHint}>キーワードを追加すると Reddit・HN から収集します</p>
+        <p style={s.emptyHint}>キーワードを追加すると Google News・Qiita から収集します</p>
       </div>
     );
   }

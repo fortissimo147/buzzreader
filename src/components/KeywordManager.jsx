@@ -64,12 +64,12 @@ export default function KeywordManager({ keywords, activeKeyword, fetchingKw, on
       </ul>
 
       {keywords.length === 0 && (
-        <p style={s.hint}>キーワードを追加すると<br />Reddit・HNから収集します</p>
+        <p style={s.hint}>キーワードを追加すると<br />Google News・Qiitaから収集します</p>
       )}
 
       <div style={s.sources}>
-        <div style={s.sourceItem}><span style={{ color: '#ff6314' }}>●</span> Hacker News</div>
-        <div style={s.sourceItem}><span style={{ color: '#ff4500' }}>●</span> Reddit</div>
+        <div style={s.sourceItem}><span style={{ color: '#4285f4' }}>●</span> Google News JP</div>
+        <div style={s.sourceItem}><span style={{ color: '#55c500' }}>●</span> Qiita</div>
       </div>
     </aside>
   );
@@ -103,7 +103,7 @@ const s = {
   kDot: { width: 8, height: 8, borderRadius: '50%', flexShrink: 0 },
   kLabel: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   del: { background: 'none', border: 'none', color: '#5a5d78', cursor: 'pointer', fontSize: 16, padding: 0 },
-  hint: { fontSize: 12, color: '#4a4d68', textAlign: 'center', lineHeight: 1.7 },
+  hint: { fontSize: 12, color: '#4a4d68', textAlign: 'center', lineHeight: 1.7, padding: '0 4px' },
   sources: { marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 4 },
   sourceItem: { fontSize: 11, color: '#4a4d68', display: 'flex', alignItems: 'center', gap: 6 },
 };
