@@ -21,10 +21,10 @@ export const getPosts = () => load(K.posts, []);
 export function addPosts(newPosts) {
   const existing = getPosts();
   const ids = new Set(existing.map(p => p.id));
-  const cutoff = new Date(Date.now() - 7 * 86400000).toISOString();
+  const cutoff = new Date(Date.now() - 90 * 86400000).toISOString();
   const merged = [...newPosts.filter(p => !ids.has(p.id)), ...existing]
     .filter(p => p.created_at >= cutoff)
-    .slice(0, 2000);
+    .slice(0, 10000);
   localStorage.setItem(K.posts, JSON.stringify(merged));
 }
 

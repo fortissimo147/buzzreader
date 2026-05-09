@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import KeywordManager from './components/KeywordManager';
 import PostTimeline from './components/PostTimeline';
 import FrequencyChart from './components/FrequencyChart';
+import AlertSettings from './components/AlertSettings';
 import { getKeywords, addKeyword, removeKeyword, getPosts, addPosts, clearKeywordPosts } from './store';
 import { fetchKeyword } from './api';
+import { checkAndSendAlerts } from './emailAlert';
 
 const POLL_MS = 5 * 60 * 1000;
 
@@ -21,7 +23,8 @@ export default function App() {
   const [lastFetched, setLastFetched] = useState(null);
   const [activeKeyword, setActiveKeyword] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
-  const [range, setRange] = useState({ label: '24時間', hours: 24 });
+  const [range, setRange] = useState({ label: '24時間', hours: 24, gran: 'hour' });
+  const [showAlert, setShowAlert] = useState(false);
 
   const refresh = useCallback(() => setPosts(getPosts()), []);
 
@@ -38,6 +41,7 @@ export default function App() {
     }
     setFetchingKw(null);
     setLastFetched(new Date());
+    checkAndSendAlerts(getPosts(), kws).catch(console.error);
   }, [refresh]);
 
   useEffect(() => {
@@ -51,8 +55,13 @@ export default function App() {
     addKeyword(kw);
     setKeywords(getKeywords());
     setFetchingKw(kw);
-    try { addPosts(await fetchKeyword(kw)); refresh(); }
-    finally { setFetchingKw(null); setLastFetched(new Date()); }
+    try {
+      addPosts(await fetchKeyword(kw));
+      refresh();
+    } finally {
+      setFetchingKw(null);
+      setLastFetched(new Date());
+    }
   }
 
   function handleRemove(kw) {
@@ -92,6 +101,9 @@ export default function App() {
               <span style={s.metaText}>{timeAgo(lastFetched)} 更新</span>
             )}
             <span style={s.badge}>{displayed.length} 件</span>
+            <button style={s.alertBtn} onClick={() => setShowAlert(true)} title="アラート設定">
+              🔔
+            </button>
           </div>
         </header>
         <div style={s.content}>
@@ -101,6 +113,7 @@ export default function App() {
           }
         </div>
       </div>
+      {showAlert && <AlertSettings onClose={() => setShowAlert(false)} />}
     </div>
   );
 }
@@ -121,9 +134,10 @@ const s = {
   meta: { display: 'flex', alignItems: 'center', gap: 10 },
   pulse: { fontSize: 12, color: '#7c6af7' },
   metaText: { fontSize: 12, color: '#4a4d68' },
-  badge: {
-    fontSize: 11, background: '#1e2035', color: '#8b8ea8',
-    borderRadius: 20, padding: '2px 10px',
+  badge: { fontSize: 11, background: '#1e2035', color: '#8b8ea8', borderRadius: 20, padding: '2px 10px' },
+  alertBtn: {
+    background: 'none', border: 'none', cursor: 'pointer',
+    fontSize: 18, padding: '4px', borderRadius: 8, opacity: 0.7,
   },
   content: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' },
 };
