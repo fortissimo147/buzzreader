@@ -4,7 +4,7 @@ import PostTimeline from './components/PostTimeline';
 import FrequencyChart from './components/FrequencyChart';
 import AlertSettings from './components/AlertSettings';
 import { getKeywords, addKeyword, removeKeyword, getPosts, addPosts, clearKeywordPosts, getSettings } from './store';
-import { fetchKeyword, fetchThreads } from './api';
+import { fetchKeyword, fetchThreads, fetchYouTube } from './api';
 import { checkAndSendAlerts } from './emailAlert';
 
 const POLL_MS = 5 * 60 * 1000;
@@ -30,7 +30,7 @@ export default function App() {
 
   const fetchAll = useCallback(async (kws) => {
     if (!kws.length) return;
-    const { threadsEnabled, threadsWorkerUrl } = getSettings();
+    const { threadsEnabled, threadsWorkerUrl, youtubeEnabled, youtubeApiKey } = getSettings();
 
     for (const kw of kws) {
       setFetchingKw(kw);
@@ -38,6 +38,9 @@ export default function App() {
         const sources = [fetchKeyword(kw)];
         if (threadsEnabled && threadsWorkerUrl) {
           sources.push(fetchThreads(kw, threadsWorkerUrl));
+        }
+        if (youtubeEnabled && youtubeApiKey) {
+          sources.push(fetchYouTube(kw, youtubeApiKey));
         }
         const results = await Promise.allSettled(sources);
         results.forEach(r => { if (r.status === 'fulfilled') addPosts(r.value); });
@@ -63,9 +66,10 @@ export default function App() {
     setKeywords(getKeywords());
     setFetchingKw(kw);
     try {
-      const { threadsEnabled, threadsWorkerUrl } = getSettings();
+      const { threadsEnabled, threadsWorkerUrl, youtubeEnabled, youtubeApiKey } = getSettings();
       const sources = [fetchKeyword(kw)];
       if (threadsEnabled && threadsWorkerUrl) sources.push(fetchThreads(kw, threadsWorkerUrl));
+      if (youtubeEnabled && youtubeApiKey) sources.push(fetchYouTube(kw, youtubeApiKey));
       const results = await Promise.allSettled(sources);
       results.forEach(r => { if (r.status === 'fulfilled') addPosts(r.value); });
       refresh();

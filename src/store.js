@@ -32,7 +32,10 @@ export function clearKeywordPosts(kw) {
   localStorage.setItem(K.posts, JSON.stringify(getPosts().filter(p => p.keyword !== kw)));
 }
 
-const DEFAULT_SETTINGS = { threadsWorkerUrl: '', threadsEnabled: false };
+const DEFAULT_SETTINGS = {
+  threadsWorkerUrl: '', threadsEnabled: false,
+  youtubeApiKey: '', youtubeEnabled: false,
+};
 
 export function getSettings() {
   return { ...DEFAULT_SETTINGS, ...load(K.settings, {}) };

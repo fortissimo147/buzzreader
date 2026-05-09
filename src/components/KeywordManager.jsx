@@ -71,6 +71,7 @@ export default function KeywordManager({ keywords, activeKeyword, fetchingKw, on
         <div style={s.sourceItem}><span style={{ color: '#4285f4' }}>●</span> Google News JP</div>
         <div style={s.sourceItem}><span style={{ color: '#55c500' }}>●</span> Qiita</div>
         <div style={s.sourceItem}><span style={{ color: '#a855f7' }}>●</span> Threads (設定時)</div>
+        <div style={s.sourceItem}><span style={{ color: '#ff0000' }}>●</span> YouTube (設定時)</div>
       </div>
     </aside>
   );

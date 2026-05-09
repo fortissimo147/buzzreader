@@ -54,6 +54,30 @@ export async function fetchKeyword(keyword) {
   ];
 }
 
+export async function fetchYouTube(keyword, apiKey) {
+  const url = 'https://www.googleapis.com/youtube/v3/search'
+    + `?part=snippet&q=${encodeURIComponent(keyword)}`
+    + `&type=video&order=date&maxResults=15`
+    + `&regionCode=JP&relevanceLanguage=ja`
+    + `&key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`YouTube ${res.status}`);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return (data.items ?? []).map(item => ({
+    id: `yt_${item.id.videoId}`,
+    source: 'youtube',
+    keyword,
+    title: item.snippet.title,
+    author: item.snippet.channelTitle,
+    url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+    sub: item.snippet.description?.slice(0, 120) ?? '',
+    score: 0,
+    comments: 0,
+    created_at: item.snippet.publishedAt,
+  }));
+}
+
 export async function fetchThreads(keyword, workerUrl) {
   const res = await fetch(`${workerUrl}?q=${encodeURIComponent(keyword)}`);
   if (!res.ok) throw new Error(`Threads worker ${res.status}`);

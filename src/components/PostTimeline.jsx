@@ -13,6 +13,7 @@ const SOURCE = {
   gnews:   { label: 'Google News', color: '#4285f4', bg: '#141e35' },
   qiita:   { label: 'Qiita',       color: '#55c500', bg: '#14251a' },
   threads: { label: 'Threads',     color: '#a855f7', bg: '#1e1428' },
+  youtube: { label: 'YouTube',     color: '#ff0000', bg: '#2a1414' },
 };
 
 function PostCard({ post, keywords }) {
