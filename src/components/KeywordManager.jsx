@@ -70,35 +70,22 @@ export default function KeywordManager({ keywords, activeKeyword, fetchingKw, on
       <div style={s.sources}>
         <div style={s.sourceItem}><span style={{ color: '#4285f4' }}>●</span> Google News JP</div>
         <div style={s.sourceItem}><span style={{ color: '#55c500' }}>●</span> Qiita</div>
+        <div style={s.sourceItem}><span style={{ color: '#a855f7' }}>●</span> Threads (設定時)</div>
       </div>
     </aside>
   );
 }
 
 const s = {
-  sidebar: {
-    width: 220, flexShrink: 0, background: '#13152a',
-    borderRight: '1px solid #1e2035', display: 'flex',
-    flexDirection: 'column', padding: '20px 14px', gap: 16, overflowY: 'auto',
-  },
+  sidebar: { width: 220, flexShrink: 0, background: '#13152a', borderRight: '1px solid #1e2035', display: 'flex', flexDirection: 'column', padding: '20px 14px', gap: 16, overflowY: 'auto' },
   logo: { fontSize: 18, fontWeight: 700, color: '#e2e4f0', display: 'flex', alignItems: 'center', gap: 8 },
   dot: { color: '#7c6af7', fontSize: 12 },
   form: { display: 'flex', gap: 6 },
-  input: {
-    flex: 1, background: '#1a1d2e', border: '1px solid #2a2d42',
-    borderRadius: 8, color: '#e2e4f0', fontSize: 13, padding: '7px 10px',
-    outline: 'none', minWidth: 0,
-  },
-  addBtn: {
-    background: '#7c6af7', border: 'none', borderRadius: 8, color: '#fff',
-    fontSize: 18, width: 32, height: 32, cursor: 'pointer', flexShrink: 0,
-  },
+  input: { flex: 1, background: '#1a1d2e', border: '1px solid #2a2d42', borderRadius: 8, color: '#e2e4f0', fontSize: 13, padding: '7px 10px', outline: 'none', minWidth: 0 },
+  addBtn: { background: '#7c6af7', border: 'none', borderRadius: 8, color: '#fff', fontSize: 18, width: 32, height: 32, cursor: 'pointer', flexShrink: 0 },
   label: { fontSize: 11, fontWeight: 600, color: '#5a5d78', textTransform: 'uppercase', letterSpacing: '0.08em' },
   list: { listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 2 },
-  item: {
-    display: 'flex', alignItems: 'center', gap: 8,
-    padding: '7px 10px', borderRadius: 8, cursor: 'pointer', fontSize: 14,
-  },
+  item: { display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 8, cursor: 'pointer', fontSize: 14 },
   itemActive: { background: '#1e2035' },
   kDot: { width: 8, height: 8, borderRadius: '50%', flexShrink: 0 },
   kLabel: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },

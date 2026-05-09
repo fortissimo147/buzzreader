@@ -3,8 +3,8 @@ import KeywordManager from './components/KeywordManager';
 import PostTimeline from './components/PostTimeline';
 import FrequencyChart from './components/FrequencyChart';
 import AlertSettings from './components/AlertSettings';
-import { getKeywords, addKeyword, removeKeyword, getPosts, addPosts, clearKeywordPosts } from './store';
-import { fetchKeyword } from './api';
+import { getKeywords, addKeyword, removeKeyword, getPosts, addPosts, clearKeywordPosts, getSettings } from './store';
+import { fetchKeyword, fetchThreads } from './api';
 import { checkAndSendAlerts } from './emailAlert';
 
 const POLL_MS = 5 * 60 * 1000;
@@ -24,16 +24,23 @@ export default function App() {
   const [activeKeyword, setActiveKeyword] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [range, setRange] = useState({ label: '24時間', hours: 24, gran: 'hour' });
-  const [showAlert, setShowAlert] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const refresh = useCallback(() => setPosts(getPosts()), []);
 
   const fetchAll = useCallback(async (kws) => {
     if (!kws.length) return;
+    const { threadsEnabled, threadsWorkerUrl } = getSettings();
+
     for (const kw of kws) {
       setFetchingKw(kw);
       try {
-        addPosts(await fetchKeyword(kw));
+        const sources = [fetchKeyword(kw)];
+        if (threadsEnabled && threadsWorkerUrl) {
+          sources.push(fetchThreads(kw, threadsWorkerUrl));
+        }
+        const results = await Promise.allSettled(sources);
+        results.forEach(r => { if (r.status === 'fulfilled') addPosts(r.value); });
         refresh();
       } catch (e) {
         console.error(e);
@@ -56,7 +63,11 @@ export default function App() {
     setKeywords(getKeywords());
     setFetchingKw(kw);
     try {
-      addPosts(await fetchKeyword(kw));
+      const { threadsEnabled, threadsWorkerUrl } = getSettings();
+      const sources = [fetchKeyword(kw)];
+      if (threadsEnabled && threadsWorkerUrl) sources.push(fetchThreads(kw, threadsWorkerUrl));
+      const results = await Promise.allSettled(sources);
+      results.forEach(r => { if (r.status === 'fulfilled') addPosts(r.value); });
       refresh();
     } finally {
       setFetchingKw(null);
@@ -88,8 +99,7 @@ export default function App() {
         <header style={s.header}>
           <div style={s.tabs}>
             {['タイムライン', '頻度チャート'].map((tab, i) => (
-              <button
-                key={tab}
+              <button key={tab}
                 style={{ ...s.tab, ...(activeTab === i ? s.tabActive : {}) }}
                 onClick={() => setActiveTab(i)}
               >{tab}</button>
@@ -97,13 +107,9 @@ export default function App() {
           </div>
           <div style={s.meta}>
             {fetchingKw && <span style={s.pulse}>● {fetchingKw} 取得中</span>}
-            {!fetchingKw && lastFetched && (
-              <span style={s.metaText}>{timeAgo(lastFetched)} 更新</span>
-            )}
+            {!fetchingKw && lastFetched && <span style={s.metaText}>{timeAgo(lastFetched)} 更新</span>}
             <span style={s.badge}>{displayed.length} 件</span>
-            <button style={s.alertBtn} onClick={() => setShowAlert(true)} title="アラート設定">
-              🔔
-            </button>
+            <button style={s.iconBtn} onClick={() => setShowSettings(true)} title="設定">⚙</button>
           </div>
         </header>
         <div style={s.content}>
@@ -113,7 +119,7 @@ export default function App() {
           }
         </div>
       </div>
-      {showAlert && <AlertSettings onClose={() => setShowAlert(false)} />}
+      {showSettings && <AlertSettings onClose={() => setShowSettings(false)} />}
     </div>
   );
 }
@@ -121,23 +127,14 @@ export default function App() {
 const s = {
   root: { display: 'flex', height: '100vh', overflow: 'hidden' },
   main: { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' },
-  header: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '0 20px', borderBottom: '1px solid #1e2035', height: 52, flexShrink: 0,
-  },
+  header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', borderBottom: '1px solid #1e2035', height: 52, flexShrink: 0 },
   tabs: { display: 'flex', gap: 4 },
-  tab: {
-    background: 'none', border: 'none', color: '#5a5d78',
-    fontSize: 14, fontWeight: 500, padding: '6px 14px', borderRadius: 8, cursor: 'pointer',
-  },
+  tab: { background: 'none', border: 'none', color: '#5a5d78', fontSize: 14, fontWeight: 500, padding: '6px 14px', borderRadius: 8, cursor: 'pointer' },
   tabActive: { background: '#1e2035', color: '#e2e4f0' },
   meta: { display: 'flex', alignItems: 'center', gap: 10 },
   pulse: { fontSize: 12, color: '#7c6af7' },
   metaText: { fontSize: 12, color: '#4a4d68' },
   badge: { fontSize: 11, background: '#1e2035', color: '#8b8ea8', borderRadius: 20, padding: '2px 10px' },
-  alertBtn: {
-    background: 'none', border: 'none', cursor: 'pointer',
-    fontSize: 18, padding: '4px', borderRadius: 8, opacity: 0.7,
-  },
+  iconBtn: { background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, padding: '4px', borderRadius: 8, opacity: 0.7, color: '#e2e4f0' },
   content: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' },
 };

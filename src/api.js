@@ -53,3 +53,22 @@ export async function fetchKeyword(keyword) {
     ...(q.status === 'fulfilled' ? q.value : []),
   ];
 }
+
+export async function fetchThreads(keyword, workerUrl) {
+  const res = await fetch(`${workerUrl}?q=${encodeURIComponent(keyword)}`);
+  if (!res.ok) throw new Error(`Threads worker ${res.status}`);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return (data.data ?? []).map(t => ({
+    id: `threads_${t.id}`,
+    source: 'threads',
+    keyword,
+    title: (t.text ?? '').slice(0, 280),
+    author: t.username ?? '',
+    url: `https://www.threads.net/t/${t.id}`,
+    sub: 'Threads',
+    score: t.like_count ?? 0,
+    comments: t.reply_count ?? 0,
+    created_at: t.timestamp ? new Date(t.timestamp).toISOString() : new Date().toISOString(),
+  }));
+}

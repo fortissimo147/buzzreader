@@ -1,4 +1,4 @@
-const K = { keywords: 'br_keywords', posts: 'br_posts' };
+const K = { keywords: 'br_keywords', posts: 'br_posts', settings: 'br_settings' };
 
 function load(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key) ?? 'null') ?? fallback; }
@@ -30,4 +30,14 @@ export function addPosts(newPosts) {
 
 export function clearKeywordPosts(kw) {
   localStorage.setItem(K.posts, JSON.stringify(getPosts().filter(p => p.keyword !== kw)));
+}
+
+const DEFAULT_SETTINGS = { threadsWorkerUrl: '', threadsEnabled: false };
+
+export function getSettings() {
+  return { ...DEFAULT_SETTINGS, ...load(K.settings, {}) };
+}
+
+export function saveSettings(s) {
+  localStorage.setItem(K.settings, JSON.stringify(s));
 }

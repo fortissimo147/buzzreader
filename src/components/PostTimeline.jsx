@@ -10,8 +10,9 @@ function timeAgo(iso) {
 }
 
 const SOURCE = {
-  gnews: { label: 'Google News', color: '#4285f4', bg: '#141e35' },
-  qiita: { label: 'Qiita', color: '#55c500', bg: '#14251a' },
+  gnews:   { label: 'Google News', color: '#4285f4', bg: '#141e35' },
+  qiita:   { label: 'Qiita',       color: '#55c500', bg: '#14251a' },
+  threads: { label: 'Threads',     color: '#a855f7', bg: '#1e1428' },
 };
 
 function PostCard({ post, keywords }) {
@@ -57,10 +58,7 @@ export default function PostTimeline({ posts, keywords }) {
 
 const s = {
   list: { display: 'flex', flexDirection: 'column', gap: 10, padding: '16px 20px', overflowY: 'auto', flex: 1 },
-  card: {
-    background: '#13152a', border: '1px solid #1e2035', borderRadius: 12,
-    padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 8,
-  },
+  card: { background: '#13152a', border: '1px solid #1e2035', borderRadius: 12, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 8 },
   cardHead: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   srcBadge: { fontSize: 11, fontWeight: 700, borderRadius: 4, padding: '1px 6px' },
   author: { fontSize: 12, color: '#5a5d78' },
@@ -70,10 +68,7 @@ const s = {
   sub: { fontSize: 11, color: '#4a4d68' },
   stats: { display: 'flex', gap: 16 },
   stat: { fontSize: 12, color: '#5a5d78' },
-  empty: {
-    flex: 1, display: 'flex', flexDirection: 'column',
-    alignItems: 'center', justifyContent: 'center', gap: 8,
-  },
+  empty: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 },
   emptyTitle: { fontSize: 16, fontWeight: 600, color: '#4a4d68' },
   emptyHint: { fontSize: 13, color: '#3a3d58' },
 };
