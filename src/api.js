@@ -78,6 +78,22 @@ export async function fetchYouTube(keyword, apiKey) {
   }));
 }
 
+export async function fetchTrendingJP() {
+  const feed = 'https://trends.google.com/trending/rss?geo=JP';
+  const res = await fetch(CORS + encodeURIComponent(feed));
+  if (!res.ok) throw new Error(`Trends ${res.status}`);
+  const xml = new DOMParser().parseFromString(await res.text(), 'application/xml');
+  return [...xml.querySelectorAll('item')].map((item, i) => {
+    const title = item.querySelector('title')?.textContent ?? '';
+    const traffic = item.getElementsByTagNameNS('*', 'approx_traffic')[0]?.textContent ?? '';
+    const newsItems = [...item.getElementsByTagNameNS('*', 'news_item')].map(n => ({
+      title: n.getElementsByTagNameNS('*', 'news_item_title')[0]?.textContent ?? '',
+      url:   n.getElementsByTagNameNS('*', 'news_item_url')[0]?.textContent ?? '',
+    })).filter(n => n.title);
+    return { rank: i + 1, title, traffic, newsItems };
+  });
+}
+
 export async function fetchThreads(keyword, workerUrl) {
   const res = await fetch(`${workerUrl}?q=${encodeURIComponent(keyword)}`);
   if (!res.ok) throw new Error(`Threads worker ${res.status}`);

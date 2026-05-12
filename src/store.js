@@ -1,4 +1,4 @@
-const K = { keywords: 'br_keywords', posts: 'br_posts', settings: 'br_settings' };
+const K = { keywords: 'br_keywords', posts: 'br_posts', settings: 'br_settings', companies: 'br_companies' };
 
 function load(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key) ?? 'null') ?? fallback; }
@@ -43,4 +43,10 @@ export function getSettings() {
 
 export function saveSettings(s) {
   localStorage.setItem(K.settings, JSON.stringify(s));
+}
+
+export const getCompanies = () => load(K.companies, []);
+
+export function saveCompanies(list) {
+  localStorage.setItem(K.companies, JSON.stringify(list));
 }

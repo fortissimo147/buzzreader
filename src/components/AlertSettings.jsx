@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { getAlertSettings, saveAlertSettings, sendTestEmail } from '../emailAlert';
-import { getSettings, saveSettings } from '../store';
+import { getSettings, saveSettings, getCompanies, saveCompanies } from '../store';
 
 export default function AlertSettings({ onClose }) {
   const [cfg, setCfg] = useState(getAlertSettings);
   const [svc, setSvc] = useState(getSettings);
+  const [companiesText, setCompaniesText] = useState(() => getCompanies().join('\n'));
   const [testing, setTesting] = useState(false);
   const [testMsg, setTestMsg] = useState(null);
 
@@ -14,6 +15,11 @@ export default function AlertSettings({ onClose }) {
   function handleSave() {
     saveAlertSettings(cfg);
     saveSettings(svc);
+    const list = companiesText
+      .split('\n')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+    saveCompanies([...new Set(list)]);
     onClose();
   }
 
@@ -30,12 +36,30 @@ export default function AlertSettings({ onClose }) {
     }
   }
 
+  const companyCount = companiesText.split('\n').filter(s => s.trim()).length;
+
   return (
     <div style={s.overlay} onClick={onClose}>
       <div style={s.panel} onClick={e => e.stopPropagation()}>
         <div style={s.head}>
           <span style={s.title}>設定</span>
           <button style={s.closeBtn} onClick={onClose}>×</button>
+        </div>
+
+        {/* 東証企業リスト */}
+        <div style={s.section}>
+          <div style={s.sectionTitle}>
+            <span style={{ color: '#fbbf24' }}>●</span> 東証企業リスト
+            <span style={s.countBadge}>{companyCount}社</span>
+          </div>
+          <div style={s.hint}>1行1社で企業名を貼り付け。トレンドタブで照合します。</div>
+          <textarea
+            style={s.textarea}
+            value={companiesText}
+            onChange={e => setCompaniesText(e.target.value)}
+            placeholder={'トヨタ自動車\nソニーグループ\n任天堂\n...'}
+            rows={8}
+          />
         </div>
 
         {/* YouTube 設定 */}
@@ -146,8 +170,10 @@ const s = {
   closeBtn: { background: 'none', border: 'none', color: '#5a5d78', fontSize: 22, cursor: 'pointer', padding: 0 },
   section: { display: 'flex', flexDirection: 'column', gap: 8, paddingBottom: 20, borderBottom: '1px solid #1e2035' },
   sectionTitle: { fontSize: 13, fontWeight: 700, color: '#e2e4f0', display: 'flex', alignItems: 'center', gap: 6 },
+  countBadge: { fontSize: 11, background: '#2a2d42', color: '#8b8ea8', borderRadius: 20, padding: '1px 8px', marginLeft: 4 },
   toggle: { display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: '#e2e4f0', cursor: 'pointer' },
   input: { background: '#1a1d2e', border: '1px solid #2a2d42', borderRadius: 8, color: '#e2e4f0', fontSize: 13, padding: '8px 12px', outline: 'none', width: '100%' },
+  textarea: { background: '#1a1d2e', border: '1px solid #2a2d42', borderRadius: 8, color: '#e2e4f0', fontSize: 12, padding: '8px 12px', outline: 'none', width: '100%', resize: 'vertical', fontFamily: 'monospace', lineHeight: 1.6 },
   row: { display: 'flex', alignItems: 'center', gap: 10 },
   unit: { fontSize: 12, color: '#8b8ea8', whiteSpace: 'nowrap' },
   hint: { fontSize: 12, color: '#5a5d78', lineHeight: 1.6 },
